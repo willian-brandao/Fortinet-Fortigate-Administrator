@@ -1,0 +1,118 @@
+# System and Networks Settings
+
+## Objectives
+
+## Configure Fortigate on factory default settings
+
+- Configure Fortigate on factory as the DHCP server
+- Configure and Control administrator access to Fortigate
+- Back up and restore system configuration files
+- Upgrade Fortigate firmware
+- Check and verify Fortiguard licenses
+
+# Configure Fortigate on factory default settings
+
+## Factory Default Settings
+
+- IP: 192.168.1.99/24
+    - Mangement interface on high-end and mid-range models
+    - Port1 or internal interface on entry-level models
+- PING, HTTPS, and SSH  protocol management enabled
+- Built-in DHCP server is enabled on port1 or internal interface
+    - Only on entry-level models that support DHCP server Only on entry-level models that support DHCP server Only on entry-level models that support DHCP server Only on entry-level models that support DHCP server
+- Default Login
+    - User: Admin
+    - Password:
+    - both are  case sensitive.
+    - Modify the default (blank) password.
+- Can access Fortigate on the CLI
+    - Console without network.
+    - CLI Console widget and terminal emulator, such as putty or tera term.
+
+# Interfaces IP
+
+When Fortigate operating in Network Address Translation (NAT) mode. Every interface that handle traffic must have ip address.
+
+In NAT Mode, Fortigate can use the IP address to source the traffic. If it needs to start or reply to a session as destination address for devices trying to contact fortigate or route traffic through it. 
+
+There are multiple ways to get an IP Address:
+
+- manually
+- automacally
+- DHCP
+- point to point protocol over Ethernet
+- PPPoE
+
+To access interfaces on Fortigate, try to access: 
+
+- Network > Interfaces
+
+Select a port:
+
+- port5
+
+Alias
+
+- Description of service: e.g: LAN or WAN
+
+Type:
+
+- Type of interfaca, could be VLAN, loopback, redudant/ aggregate.
+
+VRF( Virtual Routing and Forwarding):
+
+- Using for router table in the same fortigate
+- The standart is value 0 (global table routation).
+
+Role:
+
+- Define the objective of interface, e.g LAN or WAN, DMZ.
+
+# Interface Role Compared to Alias
+- Role defines interfaces settings typically grouped together:
+    - Prevents accidental misconfiguration
+    - Four Types:
+        - LAN
+        - WAN
+        - DMZ
+        - Undefined
+    - Not in list of policies
+- Alias is a friendly descriptor for the interface:
+    - Used in list of policies to label interfaces by purpose.
+
+The configuration of role could be prevent some incidents like a issues envolving a DHCP server enabled on a WAN interface instead of DHCP for clients. 
+
+The role shown o the GUI are the usual interfaces settings for that part of a topology. Settings that do not apply to the current role are hidden on the GUI. (All settings are always available on the CLI, regardless of the role) This prevents accidental misconfiguration. 
+
+For example, when the role is configured as WAN, there is no DHCP server and device detection configuration available. Device detection is usually used to detect devices internally on your LAN.
+
+If there is an unusual case, and you need to use an option that’s hidden by the current role, you can always switch the role to undefined. This displays all options. 
+
+To help you remember the use of each interface, you can give them aliases. For example. you could call part port3 internal_network. This can help to make you list of policies easier to comprehend.
+
+# Fortigate as a DHCP Server
+
+Not only wireless clientes can use Fortigate as their DHCP Server. For interface such as port 3 selecting manual option, enter a static IP on “IP/netmask” label and then enable the DHCP Server option for building DHCP server appear. Including provisioning features, such as DHCP  options and IP addresses assingments rules.
+
+# VLANs
+
+Vlans splits physival LAN into multiple logical LANs. In NAT operation mode, each VLAN form a separate broadcast domain. Multiple vlans can coexist in the same physical interface, provided they have differente VLAN IDs. In this way, a physical interafce is split into two or more logical interfaces. A tag is added to each Ethernet frame to identity the VLAN to which it belongs. 
+
+# Creating VLANs
+
+Frames sent or received by the physical interface segment are never tagged; they belong to the native VLAN.
+
+To create a VLAN using the GUI:
+
+1. Create New 
+2. Select Interface
+3. In type field select VLAN
+
+Can must specify the VLAN ID and the physival interface to which the VLAN will be bound. Frames that belong to interface of that type are always tagged. On the other hand, frames sent or received by the physical interface segment are never tagged. They belong to what is called the native VLAN (VLAN ID 0).
+
+Note that in a multi-VDOM enviroment, the physical interface and its VLAN subinterface can be in separate VDOMs. 
+
+It is important understand de concept of V-DOM. V-DOM is a virtual domain. It’s a logical firewal in a logical firewall. Each V-DOM could have a onw interface, police, vpn and administrators. 
+
+Thus, a  single Fortigate can divided to serve different customers, departments or enviroments( production, test, DMZ, etc) without one interfering with the other.
+
