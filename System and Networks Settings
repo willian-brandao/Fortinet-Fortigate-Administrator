@@ -116,3 +116,95 @@ It is important understand de concept of V-DOM. V-DOM is a virtual domain. It’
 
 Thus, a  single Fortigate can divided to serve different customers, departments or enviroments( production, test, DMZ, etc) without one interfering with the other.
 
+# Static Gateway
+
+- Must be at least one default gateway
+- If the interface is DHCP or PPPoE, you can add gateway dynamically
+
+Before integrate FortiGate into network, should configure a default gateway.
+
+If Fortigate gets a IP address through a dynamic method, such as DHCP or PPPoE, then it also retrieve the default gateway. 
+
+Otherwise,  you must configure a static route. Without this, Fortigate will not be able to respond to packets outside the subnets directly attached to its own interfaces. It probably also will not be able to connect to Fortiguard, important for Fortigate to access for updates, and may not correctly route traffic. 
+
+You should make sure that Fortigate has a route that matches all packets (destination 0.0.0.0/0), known as a default route, and forwards them through the network interface that is connected to the internet, to the IP address of the next router. 
+
+Routing completes the basic network settings that are required before you can configure firewall policies. 
+
+Can expand Advanced Options and enter a priority value. When two routes have an equal distance, the route with a lower priority value takes precedence. 
+
+# VDOMs
+
+![image.png](attachment:976b157e-fa1a-4284-b91c-244b3b1f2347:image.png)
+
+What is, more that segmenting your network, you want to subdivide policies and administrators into multiple security domains?
+
+In that case, you can enable Fortigate VDOMs, which split your Fortigate into multiple local devices. Each VDOMs has independent security policies and routing tables. Also, and by default, traffic from one VDOM cannot go to a different VDOM. This means that two interfaces in different VDOMs can share the same IP address, without any overlapping subnet problems. 
+
+When you use VDOMs, a single Fortigate device become a virtual data center of network security, unified threat management (UTM) inspection, and secure communication devices. 
+
+# Administration Methods
+
+
+Most features are available on both the GUI and CLI, but there are a few exceptions. You can1t view reports on the CLI. Also, advanced settings and diagnostic commands for super users are usually no available on the GUI.
+
+As you become more familiar with Fortigate, and especially if you want to scripts its configuration, you might want to use the CLI in addition to the GUI. You can access the CLI through either the Javascript widget on the GUI named CLI console, or through a terminal emulator such as TEra Term or Putty. Your terminal emulator can be connect through the network - SSH or Telnet - or the local console port. 
+
+SNMP and some other administrative protocols are also supported, but they are read-only. You cant use them for basic setup. 
+
+# Create an Administrative User
+
+![image.png](attachment:be7c77ed-48e8-4527-8acb-e26828216c6c:image.png)
+
+Wichever method you use, start by logging as admin. Begin by creating separate accounts for other administrators. For security and tracking purposes, it is a best practice for each administrator to have their own account. 
+
+In the Create New field, you can select either Administrator or Rest API Admin. Tipicallu, you select Administrator and the assign an Administrator Profile, which specifies that user’s administrative permissions. You could select REST API Admin to add an administrative who would use a custom application would allow you to log in to Fortigate and perform any task that you assigned Administrator Profile permits.
+
+Other options, not shown here, include:
+
+- Instead of creating accounts on Fortigate, you could configure Fortigate to query a remote authentication server.
+- In place of passwords, your administrators could authenticate using digital certificates that are issued by your internal certification authority server.
+
+If you do use passwords, ensure that they are strong and complex. For example. you could use multiple interleaved words with varying capitalization, and ramdomly insert numbers and punctuation. Do not use short passwords, or passwors that contain names, dates or words that exist in any dictionary . 
+
+In order to restrict access to specific features, you can assign permission.
+
+# Administrator Profiles
+
+When assign permissions to an administrator profile, you can specify read-and-write, read-only, or none to each area. 
+
+By default, there is a special profile name super_admin, which is used by the account named admin, You can’t change it. It provides ful access to everything, making the admin account similar to a root superuser account. The prof_admin is another default profile. It also provides full access, but unlike super_admin, it applies only to its virtual domain, not the global settings of Fortigate you can change its permissions. 
+
+You aren’t required to use a default profile. You could create a profile named auditor_access with read-only permissions. Restricting a person’s permissions to those necessary for his or her job is the best practice, because  even that account is compromised, the compromise to your Fortigate device is not total. To do this, create administrator profiles, then select apropriate profile when configuring an account. 
+
+The Override Idle Timeout option allows the admintimeout value, under config system accprofile, to be overriden per access profile. You can configure administrator profiles to increase inactivity timeout and facilitate use of the GUI for central monitoring. Note that you can do this on a per-profile basis, to prevent the option from being unintentionally set globally. So, what are the effects os administrator profiles?
+
+It’s actually more than just read or write access. Depending on the type of administrator profile that you assign, an administrator may not be able to access the entire Fortigate device. For example, you could configure as account that can view only log messages. Administratively may not be able to access global settings outside their assigned virtual domain either. virtual domains (VDOMs) are a way of subdividing the resources and configurations on a single Fortigate. Administrators with a smaller scope os permissions cannot create, or even view, accounts with more permissisons.
+
+# Administrative Access - Trusted Sources
+
+
+Another way to secure Fortigate is to define the host or subnets that are trusted sources from which to log in. In this example, 10.0.1.10  is configured as the only trusted IP for admin from which admin logs in. If admin attempts to log in from a machine with any other IP, they will receive an autentication failure message. 
+
+Note that if trusted hosts are configured on all administrators and an administrator is trying to log in  from a IP address that is not set on any of the trusted hosts for any administrators, then the administrator will not get the login page. Instead, the administrator will receive this message: “Unable to contact server”.
+
+If you leave any IPv4 addresss as 0.0.0.0/0, it means that connections from any source IP will be allowed. By default, 0.0.0.0/0 is the configuration for the administrator, althought you may want to change this. 
+
+Notice that each account can define its management host or subnet differetly. Be aware of any NAT that occurs between the desired device and Fortigate. You can easily prevent an administrator from logging in from the desired IP address if it is later NATed to another address before reaching Fortigate, thus defeating the purpose of the trusted hosts. 
+
+Another option to configure an administrator account to restrict access to only provision guest user accounts. By enabling this option, the administrator account will be able to provision guest user account given the fact a guest user group is available to provision guest users.
+
+# Administrative Access - Ports and Password
+
+
+You may also want to customize the administrative protocols port numbers. You can choose whether to allow concurrent sessions. You can use concurrent sessions to avoid accidentally overwriting settings, if you usually keep multiple browser tabs open, or accidentally leave a CLI session open without saving the settings, then begin a GUI session and accidentally edit the same settings differently. 
+
+For better security, use only secure protocols, and enforce password complexity and changes. 
+
+The idle timeout settings specifies the number os minutes before an inactive administrator session times out ( default is five minutes). A shorter idle timeout is more secure, but increasing the timer can help reduce the chance os administrator being logged out while testing changes. 
+
+You can override the idle timeout setting administrator profile using the Override Idle Timeout setting. 
+
+You can configure an administrator profile do increase inactivity timeout and facilitate user os the GUI for central monitoring. The Override Idle Timeout setting allows the admintimeout value, under config system accprofile, to be overridden per access profile. 
+
+To do this on a per profile basis, to avoid the option from being unintetionallu set globally.
